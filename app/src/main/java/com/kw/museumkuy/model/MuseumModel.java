@@ -40,6 +40,16 @@ public class MuseumModel implements Parcelable {
     @Expose
     private Integer id;
 
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public String getNama() {
         return nama;
     }
@@ -121,6 +131,9 @@ public class MuseumModel implements Parcelable {
     }
 
 
+    public MuseumModel() {
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -138,9 +151,7 @@ public class MuseumModel implements Parcelable {
         dest.writeString(this.latitude);
         dest.writeString(this.longitude);
         dest.writeValue(this.id);
-    }
-
-    public MuseumModel() {
+        dest.writeString(this.imageUrl);
     }
 
     protected MuseumModel(Parcel in) {
@@ -154,9 +165,10 @@ public class MuseumModel implements Parcelable {
         this.latitude = in.readString();
         this.longitude = in.readString();
         this.id = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.imageUrl = in.readString();
     }
 
-    public static final Parcelable.Creator<MuseumModel> CREATOR = new Parcelable.Creator<MuseumModel>() {
+    public static final Creator<MuseumModel> CREATOR = new Creator<MuseumModel>() {
         @Override
         public MuseumModel createFromParcel(Parcel source) {
             return new MuseumModel(source);

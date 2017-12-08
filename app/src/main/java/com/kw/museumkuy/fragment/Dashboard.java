@@ -13,7 +13,9 @@ import android.widget.ListView;
 import com.kw.museumkuy.R;
 import com.kw.museumkuy.activity.DetailActivity;
 import com.kw.museumkuy.adapter.MuseumAdapter;
+import com.kw.museumkuy.helper.Constant;
 import com.kw.museumkuy.model.MuseumModel;
+import com.kw.museumkuy.model.WisModel;
 import com.kw.museumkuy.rest.ApiClient;
 import com.kw.museumkuy.rest.ApiInterface;
 
@@ -69,6 +71,9 @@ public class Dashboard extends Fragment {
                             museumModel.setKecamatan(list.get(position).getKecamatan());
                             museumModel.setAlamat(list.get(position).getAlamat());
                             museumModel.setDeskripsi(list.get(position).getDeskripsi());
+                            museumModel.setLongitude(list.get(position).getLongitude());
+                            museumModel.setLatitude(list.get(position).getLatitude());
+                            museumModel.setImageUrl(Constant.imgMuseum1[position]);
                             intent.putExtra(DetailActivity.KEY_ITEM, museumModel);
                             startActivity(intent);
                         }
@@ -78,6 +83,22 @@ public class Dashboard extends Fragment {
 
             @Override
             public void onFailure(Call<List<MuseumModel>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void getDataWisatawan(){
+        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
+        Call<List<WisModel>> call = apiInterface.getDataWisatawan();
+        call.enqueue(new Callback<List<WisModel>>() {
+            @Override
+            public void onResponse(Call<List<WisModel>> call, Response<List<WisModel>> response) {
+                List<WisModel> list = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<List<WisModel>> call, Throwable t) {
 
             }
         });

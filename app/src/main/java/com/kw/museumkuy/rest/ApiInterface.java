@@ -4,6 +4,7 @@ import com.kw.museumkuy.model.AcaraModel;
 import com.kw.museumkuy.model.HalteModel;
 import com.kw.museumkuy.model.MuseumModel;
 import com.kw.museumkuy.model.TerminalModel;
+import com.kw.museumkuy.model.WisModel;
 import com.kw.museumkuy.model.market.MarketModel;
 
 import java.util.List;
@@ -29,7 +30,10 @@ public interface ApiInterface {
             "processed-data-lokasi-busway-jakarta-beserta-keterangan-per-februari-2013.csv")
     Call<List<HalteModel>> getDataHalte();
 
-
+    @GET("json?url=http://data.jakarta.go.id/dataset/447edaa5-d0fa-409f-af7a-f45408b0bd3f/resource/" +
+            "79cde944-7035-4a18-bc2e-87a95ec601c7/download/Data-Kunjungan-Museum-Daya-Tarik-Wisata-" +
+            "DKI-Jakarta-Tahun-2014-Januari-Desember.csv")
+    Call<List<WisModel>> getDataWisatawan();
 
     @GET("json?url=http://data.jakarta.go.id/dataset/8fc307e9-68c2-4dd4-9e41-f4ca8523d3a5/resource/" +
             "78bb0358-d9dc-4a1e-8d89-2fe8eb1b5d8e/download/Data-Acara-Wisata-dan-pengunjung--Balai-Kota-Tahun-2016-Editedd.csv")

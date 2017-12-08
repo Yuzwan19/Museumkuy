@@ -2,6 +2,7 @@ package com.kw.museumkuy.fragment;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,11 +18,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kw.museumkuy.R;
 import com.kw.museumkuy.activity.DetailActivity;
+import com.kw.museumkuy.helper.Constant;
 import com.kw.museumkuy.model.MuseumModel;
 import com.kw.museumkuy.rest.ApiClient;
 import com.kw.museumkuy.rest.ApiInterface;
@@ -90,6 +93,8 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
 
     private void getData() {
 //        mMap.clear();
+        final ProgressDialog dialog = new ProgressDialog(getActivity());
+        dialog.show();
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<List<MuseumModel>> call = apiInterface.getDataMuseum();
         call.enqueue(new Callback<List<MuseumModel>>() {
@@ -103,6 +108,7 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
                         mMap.addMarker(new MarkerOptions().position(lng)
                                 .title(list.get(i).getNama())
                                 .zIndex(i)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.museum))
                                 .snippet(list.get(i).getAlamat()));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lng, 14));
                     }
@@ -120,21 +126,23 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
                             museumModel.setDeskripsi(list.get((int) marker.getZIndex()).getDeskripsi());
                             museumModel.setLatitude(list.get((int) marker.getZIndex()).getLatitude());
                             museumModel.setLongitude(list.get((int) marker.getZIndex()).getLongitude());
+                            museumModel.setImageUrl(Constant.imgMuseum1[(int) marker.getZIndex()]);
                             intent.putExtra(DetailActivity.KEY_ITEM, museumModel);
                             startActivity(intent);
                         }
                     });
-
-
+                    dialog.dismiss();
 
                 } catch (NullPointerException e) {
                     Log.e(TAG, "onResponse: ", e);
+                    dialog.dismiss();
                 }
             }
 
             @Override
             public void onFailure(Call<List<MuseumModel>> call, Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                dialog.dismiss();
             }
         });
     }

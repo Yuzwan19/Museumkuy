@@ -1,5 +1,7 @@
 package com.kw.museumkuy.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +32,7 @@ import com.kw.museumkuy.rest.ApiClient;
 import com.kw.museumkuy.rest.ApiInterface;
 import com.kw.museumkuy.rest.DevClient;
 import com.kw.museumkuy.rest.DevInterface;
+import com.squareup.picasso.Picasso;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -39,7 +43,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DetailActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class DetailActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
     public static final String KEY_ITEM = "item";
@@ -48,6 +52,7 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
     MapView mMapView;
     private GoogleMap mMap;
     TextView txtDesc, txtAlamat, txtWebsite, txtHalte;
+    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +65,7 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                share();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -82,7 +86,9 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
         txtDesc = findViewById(R.id.txtDesc);
         txtAlamat = findViewById(R.id.txtAlamat);
         txtWebsite = findViewById(R.id.txtWebsite);
+        txtWebsite.setOnClickListener(this);
         txtHalte = findViewById(R.id.halte);
+        imageView = findViewById(R.id.image);
 
         museumModel = getIntent().getParcelableExtra(KEY_ITEM);
 
@@ -91,6 +97,9 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
         txtWebsite.setText(museumModel.getWebsite());
         txtAlamat.setText(String.format("%s, %s\n%s", museumModel.getAlamat(),
                 museumModel.getKecamatan(), museumModel.getWilayah()));
+        String imgUrl = museumModel.getImageUrl();
+        Picasso.with(DetailActivity.this).load(imgUrl).placeholder(android.R.color.darker_gray)
+                .error(R.color.colorPrimary).into(imageView);
 
         getDataHalte();
         getDataMarket();
@@ -126,7 +135,7 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
                 if (fpList.getLokasiHalte().toLowerCase(Locale.getDefault()).contains(charText)) {
                     listItem.add(fpList);
                     List<String> stringList = new ArrayList<>();
-                    for (int i = 0; i<listItem.size(); i++){
+                    for (int i = 0; i < listItem.size(); i++) {
                         stringList.add(listItem.get(i).getNamaHalte());
                     }
 
@@ -152,7 +161,8 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
                             .title(list.get(i).getOutlet())
                             .zIndex(i)
                             .snippet(list.get(i).getAlamat())
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+//                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.supermarket)));
 //                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lng, 14));
                 }
             }
@@ -164,7 +174,7 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
         });
     }
 
-    public void getDataPlace(){
+    public void getDataPlace() {
         DevInterface devInterface = DevClient.getClientDev().create(DevInterface.class);
         Call<TempatModel> call = devInterface.getTempat();
         call.enqueue(new Callback<TempatModel>() {
@@ -179,7 +189,8 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
                             .title(list.get(i).getNama())
                             .zIndex(i)
                             .snippet(list.get(i).getAlamat())
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+//                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.prayer)));
 //                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lng, 14));
                 }
             }
@@ -191,7 +202,7 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
         });
     }
 
-    private void getDataSPBU(){
+    private void getDataSPBU() {
         DevInterface devInterface = DevClient.getClientDev().create(DevInterface.class);
         Call<SpbuModel> call = devInterface.getSpbu();
         call.enqueue(new Callback<SpbuModel>() {
@@ -206,7 +217,8 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
                             .title(list.get(i).getJenis())
                             .zIndex(i)
                             .snippet(list.get(i).getLokasi())
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+//                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.gas_station)));
 //                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lng, 14));
                 }
             }
@@ -229,8 +241,31 @@ public class DetailActivity extends AppCompatActivity implements OnMapReadyCallb
                 .position(lng)
                 .title(museumModel.getNama())
                 .snippet(museumModel.getAlamat())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.museum)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lng, 15));
 
+    }
+
+    private void share() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT,
+                museumModel.getNama() + "\n" + museumModel.getAlamat()
+                        + "\n" + "\n" + museumModel.getDeskripsi()
+                        + "\n" + "\n" + museumModel.getWebsite()
+        );
+        sendIntent.putExtra(Intent.EXTRA_TITLE, "Info Museum untuk kamu");
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == txtWebsite) {
+            String url = "http://"+museumModel.getWebsite()+"/";
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+        }
     }
 }
